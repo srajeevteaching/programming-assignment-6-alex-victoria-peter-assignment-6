@@ -46,8 +46,8 @@ def load_storm_data ():
             storm[INDIRECT_INJURIES] = int(storm[INDIRECT_INJURIES])
             storm[DIRECT_DEATHS] = int(storm[DIRECT_DEATHS])
             storm[INDIRECT_DEATHS] = int(storm[INDIRECT_DEATHS])
-            storm[PROPERTY_DAMAGE] = int(storm[PROPERTY_DAMAGE])
-            storm[CROP_DAMAGE] = int(storm[CROP_DAMAGE])
+            storm[PROPERTY_DAMAGE] = float(storm[PROPERTY_DAMAGE])
+            storm[CROP_DAMAGE] = float(storm[CROP_DAMAGE])
             #add the strom to list of storms
             storms.append(storm)
         file.close()
@@ -56,6 +56,7 @@ def load_storm_data ():
         print ("file does not exist")
     return storms
 
+# presents options and calls the appropriate functions based off user input
 def menu(storms):
     choice = 0
     while choice != "5":
@@ -73,14 +74,51 @@ def menu(storms):
         else:
             print ("input a valid choice\n")
 
+# compares direct injuries to direct deaths of each storm and prints results to user chosen file
 def death_and_injury_data (storms):
-    print("death")
+    print ("This function will compare the direct injuries to direct deaths of each storm and print the results to a file ")
+    # asks user for filename and opens it for writing
+    filename = input("input output file name: ")
+    file = open("filename", "w")
+    print ("Difference between Direct Injuries and Direct Deaths (injuries - deaths)", file=file)
+    # runs through each storm
+    for storm in storms:
+        # finds the difference
+        diff = storm[DIRECT_INJURIES] - storm[DIRECT_DEATHS]
+        # finds which comparison to use and prints the difference and comparison to the file
+        if diff <= -5:
+            print (diff, "Significantly Less", file= file)
+        elif diff > -5 and diff <-1:
+            print(diff, "Less", file=file)
+        elif diff >= -1 and diff <= 1:
+            print(diff, "Same", file=file)
+        elif diff > 1 and diff < 5:
+            print(diff, "More", file=file)
+        else:
+            print(diff, "Significantly More", file=file)
+
 def property_damage_graph (storms):
-    print("damage")
+    print ("D")
+
+# finds the average duration of all storms and prints it
 def average_duration(storms):
-    print("duration")
+    count = 0
+    total = 0
+    # runs through each storm, finds duration, adds it to total, increase count by 1
+    for storm in storms:
+        duration = storm[END_DAY] - storm[START_DAY]
+        if duration == 0:
+            duration = 1
+        total += duration
+        count += 1
+    # calculate the average
+    avg = float(total / count)
+    print ("Average duration of all storms: %.2f" %avg, " days\n")
+
 def question_four (storms):
     print("4")
+
+
 def main():
     storms = load_storm_data()
     menu(storms)
