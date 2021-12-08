@@ -1,3 +1,5 @@
+import matplotlib.pyplot as plt
+
 START_MONTH = 0 #The year and month in the format YYYYMM in which the storm started
 START_DAY = 1 #The day of the month in which the storm started
 START_TIME = 2 #The time at which the storm started
@@ -47,15 +49,15 @@ def load_storm_data ():
 def menu(storms):
     choice = 0
     while choice != "5":
-        choice = input ("SELECT QUESTION:\n 1: Deaths and Injuries Data \n 2: Property Damage Graph \n 3: Average Duration \n 4: \n 5: quit\n ")
+        choice = input ("SELECT QUESTION:\n 1: Deaths and Injuries Data \n 2: Property Damage Graph \n 3: Average Duration \n 4: Storm Type Frequency \n 5: quit\n ")
         if choice == "1":
             death_and_injury_data (storms)
         elif choice == "2":
-            property_damage_graph (storms)
+            prop (storms)
         elif choice == "3":
             average_duration (storms)
         elif choice == "4":
-            question_four (storms)
+            storm_type_frequency (storms)
         elif choice == "5":
             print ("quiting menu")
         else:
@@ -84,26 +86,29 @@ def death_and_injury_data (storms):
         else:
             print(diff, "Significantly More", file=file)
 
-def prop(stormlist):
+def prop(storms):
     # Initialize low, medium, and high property damage
+    n = 0
     l = 0
     m = 0
     h = 0
-    for data in stormlist:
+    for data in storms:
         #change data of properties damaged to float
-        d = float(data(12))
-        if d > 10000:
+        d = data[12]
+        if d == 0:
+            n += 1 #none
+        elif d > 10000:
             h += 1 # high
         elif d < 1000:
             l += 1 # low
         else:
             m += 1 # medium
     # make a list of total high, low, and medium damage
-    dam = [l,m,h]
+    dam = [n,l,m,h]
     #ask for file name
     filename = input ('Insert name of graph file: ') # name of graph file
-    print('\tLow: ', l, '\n \tModerate: ', m, '\n \tHigh: ', h) #printing to console
-    plt.bar (['low', 'moderate', 'high'], dam, color ='red')
+    print('\tNone: ', n,'\n \tLow: ', l, '\n \tModerate: ', m, '\n \tHigh: ', h) #printing to console
+    plt.bar (['none', 'low', 'moderate', 'high'], dam, color ='red')
     plt.xlabel("Property Damage")
     plt.ylabel("Number of Storms")
     plt.title("Property Damage Caused By Storms")
@@ -127,26 +132,37 @@ def average_duration(storms):
     avg = float(total / count)
     print ("Average duration of all storms: %.2f" %avg, " days\n")
 
-def question_four (storms):
-    print("4")
+def storm_type_frequency (storms):
+    count_type = {}
+    # Count each storm type
+    for storm in storms:
+        if storm[TYPE] in count_type:
+            count_type[storm[TYPE]] += 1
+        elif not storm[TYPE] in count_type:
+            count_type[storm[TYPE]] = 1
+    most_common = max(count_type)
+    print(count_type)
+    print("The most common type is: " + str(most_common))
 
 
 def main():
     try:
+        storms = load_storm_data()
+        menu(storms)
         #ask for storm data file and open file
-        file = input('Enter the name of storm data file: ')
-        storm = open(file)
-        op = menu()
-        print()
-        if op == 1: #injuries vs deaths
-            death_and_injury_data(storm)
-        if op == 2: #property damage graph
-            print('Property Damage Graph')
-            prop(storm)
-        if op == 3: #average duration
-            average_duration(storm)
-        if op == 4: #most frequent storm
-            question_four(storm)
+    #    file = input('Enter the name of storm data file: ')
+    #    storm = open(file)
+        #op = menu(storm)
+    #    print()
+    #    if op == 1: #injuries vs deaths
+    #        death_and_injury_data(storm)
+    #    if op == 2: #property damage graph
+    #        print('Property Damage Graph')
+    #        prop(storm)
+    #    if op == 3: #average duration
+    #        average_duration(storm)
+    #    if op == 4: #most frequent storm
+    #        question_four(storm)
 
     except FileNotFoundError:
         print ('Invalid file name. Please try again.')
